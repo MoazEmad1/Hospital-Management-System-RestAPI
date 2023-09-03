@@ -34,23 +34,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         try {
             String token = getTokenFromRequest(request);
-            if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
-                String username = jwtProvider.getUsername(token);
+            if (StringUtils.hasText(token)) {
+                String username = jwtProvider.extractUsername(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                if (userDetails != null) {
+                    if (jwtProvider.validateToken(token, userDetails)) { // Pass userDetails here
+                        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                                userDetails,
+                                null,
+                                userDetails.getAuthorities()
+                        );
+                        authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                    }
+                }
             }
         } catch (Exception e) {
             logger.error("Error processing JWT token: " + e.getMessage(), e);
         }
         filterChain.doFilter(request, response);
     }
+
+
+
 
 
     private String getTokenFromRequest(HttpServletRequest request){

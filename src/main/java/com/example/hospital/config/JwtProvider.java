@@ -1,58 +1,72 @@
 package com.example.hospital.config;
 
-import com.example.hospital.exception.BlogAPIException;
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 
+import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
 
 @Component
 public class JwtProvider {
 
     @Value("${app.jwtSecret}")
     private String jwtSecret;
+    public String generateToken(String userName) {
+        Map<String, Object> claims = new HashMap<>();
+        return createToken(claims, userName);
+    }
 
-    @Value("${app.jwtExpirationMs}")
-    private int jwtExpirationMs;
-
-    public String generateJwtToken(Authentication authentication) {
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
+    private String createToken(Map<String, Object> claims, String userName) {
         return Jwts.builder()
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(new Date().getTime() + jwtExpirationMs))
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
-                .compact();
+                .setClaims(claims)
+                .setSubject(userName)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
+                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+    }
+    private Key getSignKey() {
+        byte[] keyBytes= Decoders.BASE64.decode(jwtSecret);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public boolean validateToken(String token){
-        try{
-            Jwts.parserBuilder()
-                    .setSigningKey(jwtSecret)
-                    .build()
-                    .parse(token);
-            return true;
-        } catch (MalformedJwtException ex) {
-            throw new BlogAPIException("Invalid JWT token.");
-        } catch (ExpiredJwtException ex) {
-            throw new BlogAPIException("Expired JWT token.");
-        } catch (UnsupportedJwtException ex) {
-            throw new BlogAPIException("Unsupported JWT token.");
-        } catch (IllegalArgumentException ex) {
-            throw new BlogAPIException("JWT claims string is empty.");
-        }
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
     }
 
-    public String getUsername(String token){
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(jwtSecret)
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts
+                .parserBuilder()
+                .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+    }
+
+    private Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }
