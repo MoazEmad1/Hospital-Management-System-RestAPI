@@ -1,10 +1,14 @@
 package com.example.hospital.config;
 
+import com.example.hospital.entity.Role;
+import com.example.hospital.entity.User;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.Collections;
 
 public class UserDetailsImpl implements UserDetails {
 
@@ -21,20 +25,17 @@ public class UserDetailsImpl implements UserDetails {
         this.authorities = authorities;
     }
 
-/*    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl build(User user) {
         Role role = user.getRole();
         String roleName = role.getName();
-
-        // Create a SimpleGrantedAuthority using the roleName.
-        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + roleName);
 
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),
                 user.getPassword(),
-                Collections.singletonList(authority)
+                Collections.singletonList(new SimpleGrantedAuthority(roleName))
         );
-    }*/
+    }
 
     @Override
     public String getPassword() {

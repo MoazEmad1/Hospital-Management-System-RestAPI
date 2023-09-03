@@ -32,21 +32,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
-        String token = getTokenFromRequest(request);
-        if(StringUtils.hasText(token) && jwtProvider.validateToken(token)){
-            String username = jwtProvider.getUsername(token);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        try {
+            String token = getTokenFromRequest(request);
+            if (StringUtils.hasText(token) && jwtProvider.validateToken(token)) {
+                String username = jwtProvider.getUsername(token);
+                UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                userDetails,
-                null,
-                userDetails.getAuthorities()
-            );
-            authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-            SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities()
+                );
+                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            }
+        } catch (Exception e) {
+            logger.error("Error processing JWT token: " + e.getMessage(), e);
         }
         filterChain.doFilter(request, response);
     }
+
 
     private String getTokenFromRequest(HttpServletRequest request){
         String bearerToken = request.getHeader("Authorization");

@@ -52,7 +52,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/doctors/register").permitAll()
                         .requestMatchers("/patients/register").permitAll()
-                        .requestMatchers("/login").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll()
                         .anyRequest().authenticated()
                 ).csrf(csrf->csrf.disable())
                 .exceptionHandling(entryPoint -> entryPoint.authenticationEntryPoint(jwtAuthenticationEntryPoint))

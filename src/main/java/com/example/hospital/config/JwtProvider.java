@@ -29,10 +29,6 @@ public class JwtProvider {
                 .compact();
     }
 
-/*    public String getUsernameFromJwtToken(String token) {
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
-    }*/
-
     public boolean validateToken(String token){
         try{
             Jwts.parserBuilder()
@@ -50,6 +46,7 @@ public class JwtProvider {
             throw new BlogAPIException("JWT claims string is empty.");
         }
     }
+
     public String getUsername(String token){
         Claims claims = Jwts.parserBuilder()
                 .setSigningKey(jwtSecret)

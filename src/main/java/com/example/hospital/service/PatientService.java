@@ -6,6 +6,7 @@ import com.example.hospital.entity.Role;
 import com.example.hospital.repository.PatientRepository;
 import com.example.hospital.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,6 +18,8 @@ public class PatientService {
     private PatientRepository patientRepository;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<Patient> getAllPatients() {
         return patientRepository.findAll();
@@ -34,11 +37,13 @@ public class PatientService {
         patient.setLastName(patientDto.getLastName());
         patient.setUsername(patientDto.getUsername());
         patient.setEmail(patientDto.getEmail());
-        patient.setPassword(patientDto.getPassword());
+        String encodedPassword = passwordEncoder.encode(patientDto.getPassword());
+        patient.setPassword(encodedPassword);
         patient.setGender(patientDto.getGender());
         patient.setPhoneNumber(patientDto.getPhoneNumber());
         patient.setAddress(patientDto.getAddress());
         patient.setDateOfBirth(patientDto.getDateOfBirth());
+
         Role role = new Role();
         role.setRoleId(2L);
         role.setName("ROLE_PATIENT");
@@ -46,6 +51,7 @@ public class PatientService {
         patient.setRole(role);
         return patientRepository.save(patient);
     }
+
 
     public Patient updatePatient(PatientDto patientDto) {
         Optional<Patient> optionalPatient = patientRepository.findById(patientDto.getId());
