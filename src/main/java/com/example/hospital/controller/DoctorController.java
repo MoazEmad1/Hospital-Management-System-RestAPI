@@ -1,12 +1,22 @@
 package com.example.hospital.controller;
 
+import com.example.hospital.dto.DoctorDto;
 import com.example.hospital.entity.Doctor;
 import com.example.hospital.service.DoctorService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 @RestController
+@RequestMapping("/doctors")
 public class DoctorController {
     @Autowired
     private DoctorService doctorService;
@@ -21,14 +31,28 @@ public class DoctorController {
         return doctorService.getDoctorById(id);
     }
 
-    @PostMapping
-    public Doctor createDoctor(@RequestBody Doctor doctor) {
-        return doctorService.createDoctor(doctor);
+    @PostMapping("/register")
+    public ResponseEntity<?> registerDoctor(@Valid @RequestBody DoctorDto doctorDto,  BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            List<FieldError> fieldErrors = bindingResult.getFieldErrors();
+            Map<String, String> errorMap = new HashMap<>();
+            for (FieldError fieldError : fieldErrors) {
+                errorMap.put(fieldError.getField(), fieldError.getDefaultMessage());
+            }
+            return ResponseEntity.badRequest().body(errorMap);
+        }
+        Doctor registeredDoctor = doctorService.registerDoctor(doctorDto);
+        return new ResponseEntity<>(registeredDoctor, HttpStatus.CREATED);
     }
 
-    @PutMapping("/update/{id}")
-    public Doctor updateDoctor(@PathVariable Long id, @RequestBody Doctor updatedDoctor) {
-        return doctorService.updateDoctor(id, updatedDoctor);
+    @PutMapping("/update")
+    public ResponseEntity<Doctor> updateDoctor(@Valid @RequestBody DoctorDto doctorDto) {
+        Doctor updated = doctorService.updateDoctor(doctorDto);
+        if (updated != null) {
+            return new ResponseEntity<>(updated, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @DeleteMapping("/delete/{id}")

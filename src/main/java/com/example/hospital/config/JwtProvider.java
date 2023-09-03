@@ -1,6 +1,5 @@
 package com.example.hospital.config;
 
-import com.example.hospital.entity.UserDetailsImpl;
 import com.example.hospital.exception.BlogAPIException;
 import io.jsonwebtoken.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,13 +41,13 @@ public class JwtProvider {
                     .parse(token);
             return true;
         } catch (MalformedJwtException ex) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Invalid JWT token");
+            throw new BlogAPIException("Invalid JWT token.");
         } catch (ExpiredJwtException ex) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Expired JWT token");
+            throw new BlogAPIException("Expired JWT token.");
         } catch (UnsupportedJwtException ex) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "Unsupported JWT token");
+            throw new BlogAPIException("Unsupported JWT token.");
         } catch (IllegalArgumentException ex) {
-            throw new BlogAPIException(HttpStatus.BAD_REQUEST, "JWT claims string is empty.");
+            throw new BlogAPIException("JWT claims string is empty.");
         }
     }
     public String getUsername(String token){

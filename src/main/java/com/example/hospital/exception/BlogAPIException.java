@@ -4,11 +4,9 @@ import org.springframework.http.HttpStatus;
 
 public class BlogAPIException extends RuntimeException {
 
-    private HttpStatus status;
     private String message;
 
-    public BlogAPIException(HttpStatus status, String message) {
-        this.status = status;
+    public BlogAPIException(String message) {
         this.message = message;
     }
 

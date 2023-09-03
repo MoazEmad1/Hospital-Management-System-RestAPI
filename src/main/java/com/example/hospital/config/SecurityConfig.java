@@ -50,10 +50,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/register").permitAll()
+                        .requestMatchers("/doctors/register").permitAll()
+                        .requestMatchers("/patients/register").permitAll()
                         .requestMatchers("/login").permitAll()
                         .anyRequest().authenticated()
-                )
+                ).csrf(csrf->csrf.disable())
                 .exceptionHandling(entryPoint -> entryPoint.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)

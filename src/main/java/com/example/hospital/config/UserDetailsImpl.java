@@ -1,13 +1,10 @@
-package com.example.hospital.entity;
+package com.example.hospital.config;
+
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.example.hospital.entity.User;
-import com.example.hospital.entity.Role;
 
 import java.util.Collection;
-import java.util.Collections;
 
 public class UserDetailsImpl implements UserDetails {
 
