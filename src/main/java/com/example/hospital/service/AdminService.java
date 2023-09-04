@@ -39,7 +39,7 @@ public class AdminService {
     public AdminDto registerAdmin(AdminDto adminDto) {
         Admin admin = userMapper.adminDtoToAdmin(adminDto);
         Role role = new Role();
-        role.setRoleId(2L);
+        role.setRoleId(3L);
         role.setName("ROLE_ADMIN");
         roleRepository.save(role);
         admin.setRole(role);
