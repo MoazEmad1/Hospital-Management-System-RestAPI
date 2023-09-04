@@ -14,11 +14,4 @@ public class Surgery {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String type;
-    private LocalDate date;
-    @ManyToOne
-    private Room room;
-    @OneToOne
-    private Patient patient;
-    @OneToOne
-    private Doctor doctor;
 }

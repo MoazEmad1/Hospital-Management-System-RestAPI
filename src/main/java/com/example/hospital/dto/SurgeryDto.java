@@ -1,10 +1,9 @@
 package com.example.hospital.dto;
 
-import java.time.LocalDate;
+import lombok.Data;
 
+@Data
 public class SurgeryDto {
-    private Long patientId;
-    private Long doctorId;
-    private Long roomId;
-    private LocalDate date;
+    private Long id;
+    private String type;
 }
