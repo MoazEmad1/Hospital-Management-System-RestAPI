@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -22,12 +23,14 @@ public class DoctorController {
     private DoctorService doctorService;
 
     @GetMapping
-    public List<Doctor> getAllDoctors() {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public List<DoctorDto> getAllDoctors() {
         return doctorService.getAllDoctors();
     }
 
     @GetMapping("/{id}")
-    public Doctor getDoctorById(@PathVariable Long id) {
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public DoctorDto getDoctorById(@PathVariable Long id) {
         return doctorService.getDoctorById(id);
     }
 
@@ -41,13 +44,14 @@ public class DoctorController {
             }
             return ResponseEntity.badRequest().body(errorMap);
         }
-        Doctor registeredDoctor = doctorService.registerDoctor(doctorDto);
+        DoctorDto registeredDoctor = doctorService.registerDoctor(doctorDto);
         return new ResponseEntity<>(registeredDoctor, HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Doctor> updateDoctor(@Valid @RequestBody DoctorDto doctorDto) {
-        Doctor updated = doctorService.updateDoctor(doctorDto);
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_DOCTOR')")
+    public ResponseEntity<DoctorDto> updateDoctor(@Valid @RequestBody DoctorDto doctorDto) {
+        DoctorDto updated = doctorService.updateDoctor(doctorDto);
         if (updated != null) {
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } else {
@@ -56,6 +60,7 @@ public class DoctorController {
     }
 
     @DeleteMapping("/delete/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     public void deleteDoctor(@PathVariable Long id) {
         doctorService.deleteDoctor(id);
     }

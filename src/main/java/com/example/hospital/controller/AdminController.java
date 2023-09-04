@@ -1,8 +1,8 @@
 package com.example.hospital.controller;
 
-import com.example.hospital.dto.PatientDto;
-import com.example.hospital.entity.Patient;
-import com.example.hospital.service.PatientService;
+import com.example.hospital.dto.AdminDto;
+import com.example.hospital.entity.Admin;
+import com.example.hospital.service.AdminService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,25 +17,26 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/patients")
-public class PatientController {
+@RequestMapping("/admins")
+public class AdminController {
     @Autowired
-    private PatientService patientService;
+    private AdminService adminService;
 
     @GetMapping
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<PatientDto> getAllPatients() {
-        return patientService.getAllPatients();
+    public List<AdminDto> getAllAdmins() {
+        return adminService.getAllAdmins();
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public PatientDto getPatientById(@PathVariable Long id) {
-        return patientService.getPatientById(id);
+    public AdminDto getAdminById(@PathVariable Long id) {
+        return adminService.getAdminById(id);
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerPatient(@Valid @RequestBody PatientDto patientDto, BindingResult bindingResult) {
+//    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<?> registerAdmin(@Valid @RequestBody AdminDto adminDto, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             List<FieldError> fieldErrors = bindingResult.getFieldErrors();
             Map<String, String> errorMap = new HashMap<>();
@@ -44,14 +45,14 @@ public class PatientController {
             }
             return ResponseEntity.badRequest().body(errorMap);
         }
-        PatientDto registeredPatient = patientService.registerPatient(patientDto);
-        return new ResponseEntity<>(registeredPatient, HttpStatus.CREATED);
+        AdminDto registeredAdmin = adminService.registerAdmin(adminDto);
+        return new ResponseEntity<>(registeredAdmin, HttpStatus.CREATED);
     }
 
     @PutMapping("/update")
-    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_PATIENT')")
-    public ResponseEntity<PatientDto> updatePatient(@Valid @RequestBody PatientDto patientDto) {
-        PatientDto updated = patientService.updatePatient(patientDto);
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    public ResponseEntity<AdminDto> updateAdmin(@Valid @RequestBody AdminDto adminDto) {
+        AdminDto updated = adminService.updateAdmin(adminDto);
         if (updated != null) {
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } else {
@@ -61,7 +62,7 @@ public class PatientController {
 
     @DeleteMapping("/delete/{id}")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public void deletePatient(@PathVariable Long id) {
-        patientService.deletePatient(id);
+    public void deleteAdmin(@PathVariable Long id) {
+        adminService.deleteAdmin(id);
     }
 }

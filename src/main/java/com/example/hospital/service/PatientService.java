@@ -2,8 +2,11 @@ package com.example.hospital.service;
 
 import com.example.hospital.dto.PatientDto;
 import com.example.hospital.entity.Patient;
+import com.example.hospital.entity.Reservation;
 import com.example.hospital.entity.Role;
+import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.repository.PatientRepository;
+import com.example.hospital.repository.ReservationRepository;
 import com.example.hospital.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -11,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PatientService {
@@ -19,57 +23,46 @@ public class PatientService {
     @Autowired
     private RoleRepository roleRepository;
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private UserMapper userMapper;
+    @Autowired
+    private ReservationRepository reservationRepository;
 
-    public List<Patient> getAllPatients() {
-        return patientRepository.findAll();
+    public List<PatientDto> getAllPatients() {
+        List<Patient> patients = patientRepository.findAll();
+        return patients.stream()
+                .map(userMapper::patientToPatientDto)
+                .collect(Collectors.toList());
     }
 
-    public Patient getPatientById(Long id) {
-        Optional<Patient> patient = patientRepository.findById(id);
-        return patient.orElse(null);
+    public PatientDto getPatientById(Long id) {
+        Optional<Patient> optionalPatient = patientRepository.findById(id);
+        return optionalPatient.map(userMapper::patientToPatientDto).orElse(null);
     }
 
-    public Patient registerPatient(PatientDto patientDto) {
-        Patient patient = new Patient();
-        patient.setId(patientDto.getId());
-        patient.setFirstName(patientDto.getFirstName());
-        patient.setLastName(patientDto.getLastName());
-        patient.setUsername(patientDto.getUsername());
-        patient.setEmail(patientDto.getEmail());
-        String encodedPassword = passwordEncoder.encode(patientDto.getPassword());
-        patient.setPassword(encodedPassword);
-        patient.setGender(patientDto.getGender());
-        patient.setPhoneNumber(patientDto.getPhoneNumber());
-        patient.setAddress(patientDto.getAddress());
-        patient.setDateOfBirth(patientDto.getDateOfBirth());
-
+    public PatientDto registerPatient(PatientDto patientDto) {
+        Patient patient = userMapper.patientDtoToPatient(patientDto);
         Role role = new Role();
         role.setRoleId(2L);
         role.setName("ROLE_PATIENT");
         roleRepository.save(role);
         patient.setRole(role);
-        return patientRepository.save(patient);
+        return userMapper.patientToPatientDto(patientRepository.save(patient));
     }
 
 
-    public Patient updatePatient(PatientDto patientDto) {
+    public PatientDto updatePatient(PatientDto patientDto) {
         Optional<Patient> optionalPatient = patientRepository.findById(patientDto.getId());
         if (optionalPatient.isPresent()) {
             Patient existingPatient = optionalPatient.get();
-            existingPatient.setFirstName(patientDto.getFirstName());
-            existingPatient.setLastName(patientDto.getLastName());
-            existingPatient.setUsername(patientDto.getUsername());
-            existingPatient.setGender(patientDto.getGender());
-            existingPatient.setDateOfBirth(patientDto.getDateOfBirth());
-            existingPatient.setEmail(patientDto.getEmail());
-            existingPatient.setPassword(patientDto.getPassword());
-            existingPatient.setPhoneNumber(patientDto.getPhoneNumber());
-            existingPatient.setAddress(patientDto.getAddress());
-            existingPatient.setNoOfAppointments(patientDto.getNoOfAppointments());
-            return patientRepository.save(existingPatient);
+            userMapper.updatePatientFromDto(patientDto, existingPatient);
+            return userMapper.patientToPatientDto(patientRepository.save(existingPatient));
         }
         return null;
+    }
+
+    public List<Reservation> getPatientReservations(String patientUsername) {
+        Patient patient = patientRepository.findByEmailOrUsername(patientUsername,patientUsername).orElse(null);
+        return reservationRepository.getPatientReservations(patient);
     }
 
     public void deletePatient(Long id) {
