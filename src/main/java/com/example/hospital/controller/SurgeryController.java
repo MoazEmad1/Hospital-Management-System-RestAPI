@@ -1,11 +1,10 @@
 package com.example.hospital.controller;
 
-import com.example.hospital.entity.Doctor;
-import com.example.hospital.entity.Patient;
-import com.example.hospital.entity.Role;
-import com.example.hospital.entity.Surgery;
+import com.example.hospital.entity.*;
 import com.example.hospital.repository.PatientRepository;
+import com.example.hospital.repository.PatientSurgeryRepository;
 import com.example.hospital.repository.RoleRepository;
+import com.example.hospital.service.PatientSurgeryService;
 import com.example.hospital.service.SurgeryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -28,8 +27,8 @@ public class SurgeryController {
     private RoleRepository roleRepository;
     @Autowired
     private PatientRepository patientRepository;
-
-
+    @Autowired
+    private PatientSurgeryService patientSurgeryService;
 
     @GetMapping("/surgeries")
     @PreAuthorize("hasAnyRole('ROLE_DOCTOR', 'ROLE_PATIENT')")
@@ -65,17 +64,21 @@ public class SurgeryController {
 
     @PostMapping("/create-surgery")
     @PreAuthorize("hasAnyRole('ROLE_PATIENT', 'ROLE_ADMIN')")
-    public Surgery createSurgery(@RequestBody Surgery surgery) {
+    public Surgery createSurgery(@RequestBody Surgery request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Optional<Patient> optionalPatient = patientRepository.findByEmailOrUsername(username,username);
+        Optional<Patient> optionalPatient = patientRepository.findByEmailOrUsername(username, username);
         Patient patient = optionalPatient.orElse(null);
-        if(patient == null){
-            patient=surgery.getPatient();
+
+        if (patient == null) {
+            patient = request.getPatient();
         }
-        Doctor doctor = surgery.getDoctor();
-        LocalDate date = surgery.getDate();
-        return surgeryService.createSurgery(patient, doctor, date);
+        Doctor doctor = request.getDoctor();
+        LocalDate date = request.getDate();
+        Room room = request.getRoom();
+        Surgery surgery = surgeryService.createSurgery(patient, doctor, date);
+        patientSurgeryService.createPatientSurgery(patient, surgery, doctor,room);
+        return surgery;
     }
 
     @PutMapping("/{id}")
