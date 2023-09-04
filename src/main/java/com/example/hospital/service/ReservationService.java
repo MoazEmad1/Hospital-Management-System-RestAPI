@@ -31,6 +31,7 @@ public class ReservationService {
         appointment.setDate(date);
         appointment.setPatient(patient);
         appointment.setDoctor(doctor);
+        patient.setNoOfAppointments(patient.getNoOfAppointments() + 1);
         return reservationRepository.save(appointment);
     }
 

@@ -1,7 +1,10 @@
 package com.example.hospital.controller;
 
+import com.example.hospital.entity.Doctor;
+import com.example.hospital.entity.Patient;
 import com.example.hospital.entity.Role;
 import com.example.hospital.entity.Surgery;
+import com.example.hospital.repository.PatientRepository;
 import com.example.hospital.repository.RoleRepository;
 import com.example.hospital.service.SurgeryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +13,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/surgeries")
@@ -21,6 +26,9 @@ public class SurgeryController {
     private SurgeryService surgeryService;
     @Autowired
     private RoleRepository roleRepository;
+    @Autowired
+    private PatientRepository patientRepository;
+
 
 
     @GetMapping("/surgeries")
@@ -55,9 +63,19 @@ public class SurgeryController {
         return surgeryService.getSurgeryById(id);
     }
 
-    @PostMapping
+    @PostMapping("/create-surgery")
+    @PreAuthorize("hasAnyRole('ROLE_PATIENT', 'ROLE_ADMIN')")
     public Surgery createSurgery(@RequestBody Surgery surgery) {
-        return surgeryService.createSurgery(surgery);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        Optional<Patient> optionalPatient = patientRepository.findByEmailOrUsername(username,username);
+        Patient patient = optionalPatient.orElse(null);
+        if(patient == null){
+            patient=surgery.getPatient();
+        }
+        Doctor doctor = surgery.getDoctor();
+        LocalDate date = surgery.getDate();
+        return surgeryService.createSurgery(patient, doctor, date);
     }
 
     @PutMapping("/{id}")

@@ -17,4 +17,8 @@ public class Surgery {
     private LocalDate date;
     @ManyToOne
     private Room room;
+    @OneToOne
+    private Patient patient;
+    @OneToOne
+    private Doctor doctor;
 }

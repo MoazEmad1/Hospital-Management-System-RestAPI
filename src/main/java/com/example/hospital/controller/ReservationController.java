@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/reservations")
@@ -71,7 +72,11 @@ public class ReservationController {
     public Reservation createDoctorAppointment(@RequestBody Reservation request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
-        Patient patient = patientRepository.findByEmailOrUsername(username,username).orElseThrow();
+        Optional<Patient> optionalPatient = patientRepository.findByEmailOrUsername(username,username);
+        Patient patient = optionalPatient.orElse(null);
+        if(patient == null){
+            patient=request.getPatient();
+        }
         Doctor doctor = request.getDoctor();
         LocalDate date = request.getDate();
         return reservationService.createDoctorAppointment(patient, doctor, date);
