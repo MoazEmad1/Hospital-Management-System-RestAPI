@@ -1,6 +1,10 @@
 package com.example.hospital.service;
 
+import com.example.hospital.entity.Doctor;
+import com.example.hospital.entity.Patient;
 import com.example.hospital.entity.Surgery;
+import com.example.hospital.repository.DoctorRepository;
+import com.example.hospital.repository.PatientRepository;
 import com.example.hospital.repository.SurgeryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,6 +17,20 @@ public class SurgeryService {
 
     @Autowired
     private SurgeryRepository surgeryRepository;
+    @Autowired
+    private DoctorRepository doctorRepository;
+    @Autowired
+    private PatientRepository patientRepository;
+
+    public List<Surgery> getDoctorSurgeries(String doctorUsername) {
+        Doctor doctor = doctorRepository.findByEmailOrUsername(doctorUsername,doctorUsername).orElseThrow();
+        return surgeryRepository.findByDoctor(doctor);
+    }
+
+    public List<Surgery> getPatientSurgeries(String patientUsername) {
+        Patient patient = patientRepository.findByEmailOrUsername(patientUsername,patientUsername).orElseThrow();
+        return surgeryRepository.findByPatient(patient);
+    }
 
     public List<Surgery> getAllSurgeries() {
         return surgeryRepository.findAll();
