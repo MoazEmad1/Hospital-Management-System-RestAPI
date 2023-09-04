@@ -51,8 +51,7 @@ public class PatientSurgeryController {
     @PostMapping("/create-surgery")
     @PreAuthorize("hasAnyRole('ROLE_PATIENT', 'ROLE_ADMIN')")
     public Patient_SurgeryDto createSurgery(@RequestBody Patient_SurgeryDto request) {
-        Patient_SurgeryDto patientSurgeryDto = patientSurgeryService.createPatientSurgery(request);
-        return patientSurgeryDto;
+        return patientSurgeryService.createPatientSurgery(request);
     }
 
     @PutMapping("/{id}")

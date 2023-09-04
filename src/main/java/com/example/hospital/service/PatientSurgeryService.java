@@ -67,9 +67,8 @@ public class PatientSurgeryService {
         }
 
         Patient_Surgery patientSurgery = new Patient_Surgery(surgery, patient, doctor, room, date);
-        patientSurgeryRepository.save(patientSurgery);
 
-        return userMapper.patient_SurgeryToPatient_SurgeryDto(patientSurgery);
+        return userMapper.patient_SurgeryToPatient_SurgeryDto(patientSurgeryRepository.save(patientSurgery));
     }
 
 

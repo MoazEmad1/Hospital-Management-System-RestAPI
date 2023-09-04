@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 @Data
 public class Patient_SurgeryDto {
+    private Long id;
     private Surgery surgery;
     private Patient patient;
     private Doctor doctor;
