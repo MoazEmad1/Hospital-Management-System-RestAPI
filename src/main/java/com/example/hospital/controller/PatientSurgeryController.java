@@ -10,11 +10,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
-@RequestMapping("/surgeries")
+@RequestMapping("/patient-surgeries")
 public class PatientSurgeryController {
     @Autowired
     private RoleRepository roleRepository;
@@ -60,7 +59,7 @@ public class PatientSurgeryController {
     }
 
     @DeleteMapping("/{id}")
-    public void deleteSurgery(@PathVariable Long id) {
+    public void deletePatientSurgery(@PathVariable Long id) {
         patientSurgeryService.deletePatient_Surgery(id);
     }
 }

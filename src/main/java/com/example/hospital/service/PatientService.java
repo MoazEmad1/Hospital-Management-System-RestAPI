@@ -1,15 +1,14 @@
 package com.example.hospital.service;
 
+import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.dto.PatientDto;
 import com.example.hospital.entity.Patient;
 import com.example.hospital.entity.Reservation;
 import com.example.hospital.entity.Role;
-import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.repository.PatientRepository;
 import com.example.hospital.repository.ReservationRepository;
 import com.example.hospital.repository.RoleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,8 +53,8 @@ public class PatientService {
         Optional<Patient> optionalPatient = patientRepository.findById(patientDto.getId());
         if (optionalPatient.isPresent()) {
             Patient existingPatient = optionalPatient.get();
-            userMapper.updatePatientFromDto(patientDto, existingPatient);
-            return userMapper.patientToPatientDto(patientRepository.save(existingPatient));
+            Patient updatedPatient = userMapper.updatePatientFromDto(patientDto, existingPatient);
+            return userMapper.patientToPatientDto(patientRepository.save(updatedPatient));
         }
         return null;
     }

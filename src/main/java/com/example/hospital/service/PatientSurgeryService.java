@@ -1,12 +1,11 @@
 package com.example.hospital.service;
 
+import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.dto.Patient_SurgeryDto;
 import com.example.hospital.entity.*;
-import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.repository.DoctorRepository;
 import com.example.hospital.repository.PatientRepository;
 import com.example.hospital.repository.PatientSurgeryRepository;
-import com.example.hospital.repository.SurgeryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -76,8 +75,9 @@ public class PatientSurgeryService {
         Optional<Patient_Surgery> patientSurgery = patientSurgeryRepository.findById(id);
         if (patientSurgery.isPresent()) {
             Patient_Surgery updatedSurgery = patientSurgery.get();
-            userMapper.updatePatientSurgeryFromDto(patientSurgeryDto, updatedSurgery);
-            return userMapper.patient_SurgeryToPatient_SurgeryDto(patientSurgeryRepository.save(updatedSurgery));
+            updatedSurgery = userMapper.updatePatientSurgeryFromDto(patientSurgeryDto, updatedSurgery);
+            updatedSurgery = patientSurgeryRepository.save(updatedSurgery);
+            return userMapper.patient_SurgeryToPatient_SurgeryDto(updatedSurgery);
         }
         return null;
     }

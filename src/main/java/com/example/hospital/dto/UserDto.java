@@ -1,6 +1,9 @@
 package com.example.hospital.dto;
 
 import com.example.hospital.entity.Gender;
+import com.example.hospital.entity.Role;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -21,10 +24,12 @@ public class UserDto {
     private String email;
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
+    @Enumerated(EnumType.STRING)
     private Gender gender;
     @Pattern(regexp = "\\d{10}", message = "Invalid phone number format")
     private String phoneNumber;
     @NotBlank(message = "Address is required")
     private String address;
     private LocalDate dateOfBirth;
+    private Role role;
 }

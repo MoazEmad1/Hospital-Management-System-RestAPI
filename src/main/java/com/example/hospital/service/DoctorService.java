@@ -1,9 +1,9 @@
 package com.example.hospital.service;
 
+import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.dto.DoctorDto;
 import com.example.hospital.entity.Reservation;
 import com.example.hospital.entity.Role;
-import com.example.hospital.mapper.UserMapper;
 import com.example.hospital.repository.ReservationRepository;
 import com.example.hospital.repository.RoleRepository;
 import org.springframework.stereotype.Service;
@@ -55,8 +55,8 @@ public class DoctorService {
         Optional<Doctor> optionalDoctor = doctorRepository.findById(doctorDto.getId());
         if (optionalDoctor.isPresent()) {
             Doctor existingDoctor = optionalDoctor.get();
-            userMapper.updateDoctorFromDto(doctorDto, existingDoctor);
-            return userMapper.doctorToDoctorDto(doctorRepository.save(existingDoctor));
+            Doctor updatedDoctor = userMapper.updateDoctorFromDto(doctorDto, existingDoctor);
+            return userMapper.doctorToDoctorDto(doctorRepository.save(updatedDoctor));
         }
         return null;
     }
