@@ -1,0 +1,73 @@
+version: "3.5"
+
+services:
+  # Install mysql and set up the test database.
+  db:
+    container_name: db
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'db'
+      # So you don't have to use root, but you can if you like
+      MYSQL_USER: 'user'
+      # You can use whatever password you like
+      MYSQL_PASSWORD: 'password'
+      # Password for root access
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      # <Port exposed> : <MySQL Port running inside container>
+      - '3306:3306'
+    expose:
+      # Opens port 3306 on the container
+      - '3306'
+    volumes:
+      # Add your custom my.cnf file to the MySQL container
+      - ./my.cnf:/etc/mysql/my.cnf  # Mount custom my.cnf
+      - my-db:/var/lib/mysql  # Named volume declaration
+
+  # Install zookeeper.
+  zookeeper:
+    container_name: zookeeper
+    image: zookeeper
+    ports:
+      - 2181:2181
+
+  # Install Kafka and create needed topics.
+  kafka:
+    container_name: kafka
+    image: confluentinc/cp-kafka
+    hostname: kafka
+    ports:
+      - 9092:9092
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://kafka:29092
+      LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:29092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - zookeeper
+
+  # Install Debezium Connector.
+  debezium-connect:
+    container_name: debezium-connect
+    image: debezium/connect
+    hostname: debezium-connect
+    ports:
+      - '8083:8083'
+    environment:
+      GROUP_ID: 1
+      CONFIG_STORAGE_TOPIC: debezium_connect_config
+      OFFSET_STORAGE_TOPIC: debezium_connect_offsets
+      STATUS_STORAGE_TOPIC: debezium_connect_status
+      BOOTSTRAP_SERVERS: kafka:9092
+    depends_on:
+      - kafka
+      - db
+
+# Named volume declaration
+volumes:
+  my-db:
+

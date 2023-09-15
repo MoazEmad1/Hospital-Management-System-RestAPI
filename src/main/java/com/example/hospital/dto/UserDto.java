@@ -31,5 +31,4 @@ public class UserDto {
     @NotBlank(message = "Address is required")
     private String address;
     private LocalDate dateOfBirth;
-    private Role role;
 }

@@ -16,6 +16,7 @@ com/example/hospital/entity/Room.class
 com/example/hospital/dto/SurgeryDto.class
 com/example/hospital/service/CustomUserDetailsService.class
 com/example/hospital/config/JwtProvider.class
+com/example/hospital/kafka/KafkaConsumer.class
 com/example/hospital/repository/RoomRepository.class
 com/example/hospital/repository/PatientSurgeryRepository.class
 com/example/hospital/repository/SurgeryRepository.class

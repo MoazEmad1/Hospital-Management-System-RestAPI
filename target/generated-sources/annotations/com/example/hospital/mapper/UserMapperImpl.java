@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2023-09-14T20:55:47+0200",
+    date = "2023-09-14T22:11:50+0200",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 18.0.2-ea (Private Build)"
 )
 @Component
@@ -64,7 +64,6 @@ public class UserMapperImpl implements UserMapper {
         doctorDto.setPhoneNumber( doctor.getPhoneNumber() );
         doctorDto.setAddress( doctor.getAddress() );
         doctorDto.setDateOfBirth( doctor.getDateOfBirth() );
-        doctorDto.setRole( doctor.getRole() );
         doctorDto.setSpecialization( doctor.getSpecialization() );
         Set<DayOfWeek> set = doctor.getDaysAvailable();
         if ( set != null ) {
@@ -92,7 +91,6 @@ public class UserMapperImpl implements UserMapper {
         patientDto.setPhoneNumber( patient.getPhoneNumber() );
         patientDto.setAddress( patient.getAddress() );
         patientDto.setDateOfBirth( patient.getDateOfBirth() );
-        patientDto.setRole( patient.getRole() );
         patientDto.setNoOfAppointments( patient.getNoOfAppointments() );
 
         return patientDto;
@@ -155,7 +153,6 @@ public class UserMapperImpl implements UserMapper {
         doctor.setPhoneNumber( doctorDto.getPhoneNumber() );
         doctor.setAddress( doctorDto.getAddress() );
         doctor.setDateOfBirth( doctorDto.getDateOfBirth() );
-        doctor.setRole( doctorDto.getRole() );
         doctor.setId( doctorDto.getId() );
         Set<DayOfWeek> set = doctorDto.getDaysAvailable();
         if ( set != null ) {
@@ -183,7 +180,6 @@ public class UserMapperImpl implements UserMapper {
         patient.setPhoneNumber( patientDto.getPhoneNumber() );
         patient.setAddress( patientDto.getAddress() );
         patient.setDateOfBirth( patientDto.getDateOfBirth() );
-        patient.setRole( patientDto.getRole() );
         patient.setId( patientDto.getId() );
         patient.setNoOfAppointments( patientDto.getNoOfAppointments() );
 
@@ -227,12 +223,14 @@ public class UserMapperImpl implements UserMapper {
             doctor1.setPhoneNumber( doctorDto.getPhoneNumber() );
             doctor1.setAddress( doctorDto.getAddress() );
             doctor1.setDateOfBirth( doctorDto.getDateOfBirth() );
-            doctor1.setRole( doctorDto.getRole() );
             doctor1.setSpecialization( doctorDto.getSpecialization() );
             Set<DayOfWeek> set = doctorDto.getDaysAvailable();
             if ( set != null ) {
                 doctor1.setDaysAvailable( new LinkedHashSet<DayOfWeek>( set ) );
             }
+        }
+        if ( doctor != null ) {
+            doctor1.setRole( doctor.getRole() );
         }
 
         return doctor1;
@@ -257,8 +255,10 @@ public class UserMapperImpl implements UserMapper {
             patient1.setPhoneNumber( patientDto.getPhoneNumber() );
             patient1.setAddress( patientDto.getAddress() );
             patient1.setDateOfBirth( patientDto.getDateOfBirth() );
-            patient1.setRole( patientDto.getRole() );
             patient1.setNoOfAppointments( patientDto.getNoOfAppointments() );
+        }
+        if ( patient != null ) {
+            patient1.setRole( patient.getRole() );
         }
 
         return patient1;
@@ -283,7 +283,9 @@ public class UserMapperImpl implements UserMapper {
             admin1.setPhoneNumber( adminDto.getPhoneNumber() );
             admin1.setAddress( adminDto.getAddress() );
             admin1.setDateOfBirth( adminDto.getDateOfBirth() );
-            admin1.setRole( adminDto.getRole() );
+        }
+        if ( admin != null ) {
+            admin1.setRole( admin.getRole() );
         }
 
         return admin1;

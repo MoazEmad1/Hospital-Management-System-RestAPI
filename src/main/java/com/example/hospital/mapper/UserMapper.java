@@ -18,10 +18,7 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
-    @Mappings({
-            @Mapping(target = "role", ignore = true), // Ignore the 'role' property
-            // Map other properties here
-    })
+
     AdminDto adminToAdminDto(Admin admin);
 
     DoctorDto doctorToDoctorDto(Doctor doctor);
@@ -30,10 +27,6 @@ public interface UserMapper {
 
     Patient_SurgeryDto patient_SurgeryToPatient_SurgeryDto(Patient_Surgery patient_surgery);
 
-    @Mappings({
-            @Mapping(target = "role", ignore = true), // Ignore the 'role' property
-            // Map other properties here
-    })
     Admin adminDtoToAdmin(AdminDto adminDto);
 
     Doctor doctorDtoToDoctor(DoctorDto doctorDto);
@@ -53,7 +46,6 @@ public interface UserMapper {
             @Mapping(target = "phoneNumber", source = "doctorDto.phoneNumber"),
             @Mapping(target = "address", source = "doctorDto.address"),
             @Mapping(target = "dateOfBirth", source = "doctorDto.dateOfBirth"),
-            @Mapping(target = "role", source = "doctorDto.role"),
             @Mapping(target = "specialization", source = "doctorDto.specialization"),
             @Mapping(target = "daysAvailable", source = "doctorDto.daysAvailable")
     })
@@ -71,7 +63,6 @@ public interface UserMapper {
             @Mapping(target = "phoneNumber", source = "patientDto.phoneNumber"),
             @Mapping(target = "address", source = "patientDto.address"),
             @Mapping(target = "dateOfBirth", source = "patientDto.dateOfBirth"),
-            @Mapping(target = "role", source = "patientDto.role"),
             @Mapping(target = "noOfAppointments", source = "patientDto.noOfAppointments")
     })
     Patient updatePatientFromDto(PatientDto patientDto, Patient patient);
@@ -86,8 +77,7 @@ public interface UserMapper {
             @Mapping(target = "gender", source = "adminDto.gender"),
             @Mapping(target = "phoneNumber", source = "adminDto.phoneNumber"),
             @Mapping(target = "address", source = "adminDto.address"),
-            @Mapping(target = "dateOfBirth", source = "adminDto.dateOfBirth"),
-            @Mapping(target = "role", source = "adminDto.role")
+            @Mapping(target = "dateOfBirth", source = "adminDto.dateOfBirth")
     })
     Admin updateAdminFromDto(AdminDto adminDto, Admin admin);
 
