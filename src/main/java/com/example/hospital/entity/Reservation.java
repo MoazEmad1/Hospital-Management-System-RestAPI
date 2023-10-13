@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Entity
@@ -13,7 +14,8 @@ public class Reservation {
     @Id
     @GeneratedValue
     private Long id;
-    private LocalDate date;
+    @OneToOne
+    private ReservationDate date;
     @OneToOne
     private Doctor doctor;
     @ManyToOne

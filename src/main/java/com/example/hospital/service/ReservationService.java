@@ -3,6 +3,7 @@ package com.example.hospital.service;
 import com.example.hospital.entity.Doctor;
 import com.example.hospital.entity.Patient;
 import com.example.hospital.entity.Reservation;
+import com.example.hospital.entity.ReservationDate;
 import com.example.hospital.repository.ReservationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,12 +28,23 @@ public class ReservationService {
     }
 
     public Reservation createDoctorAppointment(Patient patient, Doctor doctor, LocalDate date) {
-        Reservation appointment = new Reservation();
-        appointment.setDate(date);
-        appointment.setPatient(patient);
-        appointment.setDoctor(doctor);
+        if(!doctor.getDaysAvailable().contains(date.getDayOfWeek())) {
+            return null;
+        }
+        ReservationDate reservationDate = new ReservationDate();
+        reservationDate.setDate(date);
+        Optional<Reservation> reservationOp=reservationRepository.getReservationByDoctorAndPatientAndDate(doctor,patient,reservationDate);
+        Reservation reservation = new Reservation();
+        if(reservationOp.isPresent()) {
+            reservation = reservationOp.get();
+        }else {
+            reservation.setDate(reservationDate);
+            reservation.setDoctor(doctor);
+            reservation.setPatient(patient);
+        }
+        reservation.getDate().setCount(reservation.getDate().getCount()+1);
         patient.setNoOfAppointments(patient.getNoOfAppointments() + 1);
-        return reservationRepository.save(appointment);
+        return reservationRepository.save(reservation);
     }
 
     public void deleteReservation(Long id) {

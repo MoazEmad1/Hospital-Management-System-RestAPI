@@ -1,5 +1,6 @@
 package com.example.hospital.controller;
 
+import com.example.hospital.dto.ReservationDto;
 import com.example.hospital.entity.Doctor;
 import com.example.hospital.entity.Patient;
 import com.example.hospital.entity.Reservation;
@@ -69,7 +70,7 @@ public class ReservationController {
 
     @PostMapping("/make-appointment")
     @PreAuthorize("hasAnyRole('ROLE_PATIENT','ROLE_ADMIN')")
-    public Reservation createDoctorAppointment(@RequestBody Reservation request) {
+    public Reservation createDoctorAppointment(@RequestBody ReservationDto request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         Optional<Patient> optionalPatient = patientRepository.findByEmailOrUsername(username,username);
